@@ -54,6 +54,9 @@ dkms.conf
 # Custom
 
 main
-.vscode
-lab
-lab.c
+test
+main-sanitize
+test-sanitize
+todo
+todo-sanitize
+.task
