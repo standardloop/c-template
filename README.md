@@ -1,6 +1,6 @@
 # c-template
 
-https://github.com/standardloop/c-template
+[https://github.com/standardloop/c-template](https://github.com/standardloop/c-template)
 
 [![GitHub Release](https://img.shields.io/github/v/release/standardloop/c-template?sort=semver)](https://github.com/standardloop/c-template/releases) ![C Version](https://img.shields.io/badge/C_Standard-C17-00599C?logo=c&logoColor=white)
 
