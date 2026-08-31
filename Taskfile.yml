@@ -151,3 +151,8 @@ tasks:
       # - cp /usr/local/lib/standardloop/libstandardloop-util.dylib ./ # to get around sips we need to move dylibs to local dir
       - leaks --atExit -- ./{{.TEST_EXECUTABLE_NAME}}
       # - rm libstandardloop-util.dylib
+
+  fmt:
+    silent: true
+    cmds:
+      - find . \( -name "*.c" -o -name "*.h" \) -exec clang-format -style=file -i {} +
