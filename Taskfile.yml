@@ -188,37 +188,53 @@ tasks:
 
   docs:
     deps:
-      - docs:clang-docs
+      - docs:moxygen
 
-  docs:bear:
-    run: once
-    desc: "Build the test program."
+  docs:doxygen:
+    desc: "https://www.doxygen.nl/"
     cmds:
-      - |
-        bear -- {{.CC}} {{.CC_FLAGS}} \
-        test.c \
-        -isysroot {{.SDK_PATH}} \
-        {{range .SOURCE_FILES}} {{.}} {{end}} \
-        {{range .TEST_SOURCE_FILES}} {{.}} {{end}} \
-        -o {{.TEST_EXECUTABLE_NAME}}
-    vars:
-      SDK_PATH:
-        sh: xcrun --show-sdk-path
-    sources:
-      - "*.c"
-      - Taskfile.yml
-    generates:
-      - compile_commands.json
+      - doxygen Doxyfile
 
-  docs:clang-docs:
+  docs:moxygen:
+    desc: "https://0state.com/moxygen"
     deps:
-      - docs:bear
-    vars:
-      OUT_DIR: docs
+      - docs:doxygen
     cmds:
-      - mkdir -p {{.OUT_DIR}}/md {{.OUT_DIR}}/json
-      - clang-doc --format=md --output={{.OUT_DIR}} -p=. {{range .SOURCE_FILES}} {{.}} {{end}}
-      - rm -rf {{.OUT_DIR}}/json
-    sources:
-      - compile_commands.json
-      - "*.c"
+      - moxygen doxygen/xml/ --output docs/index.md --quiet
+
+  # docs:
+  #   deps:
+  #     - docs:clang-docs
+
+  # docs:bear:
+  #   run: once
+  #   desc: "Build the test program."
+  #   cmds:
+  #     - |
+  #       bear -- {{.CC}} {{.CC_FLAGS}} \
+  #       test.c \
+  #       -isysroot {{.SDK_PATH}} \
+  #       {{range .SOURCE_FILES}} {{.}} {{end}} \
+  #       {{range .TEST_SOURCE_FILES}} {{.}} {{end}} \
+  #       -o {{.TEST_EXECUTABLE_NAME}}
+  #   vars:
+  #     SDK_PATH:
+  #       sh: xcrun --show-sdk-path
+  #   sources:
+  #     - "*.c"
+  #     - Taskfile.yml
+  #   generates:
+  #     - compile_commands.json
+
+  # docs:clang-docs:
+  #   deps:
+  #     - docs:bear
+  #   vars:
+  #     OUT_DIR: docs
+  #   cmds:
+  #     - mkdir -p {{.OUT_DIR}}/md {{.OUT_DIR}}/json
+  #     - clang-doc --format=md --output={{.OUT_DIR}} -p=. {{range .SOURCE_FILES}} {{.}} {{end}}
+  #     - rm -rf {{.OUT_DIR}}/json
+  #   sources:
+  #     - compile_commands.json
+  #     - "*.c"
