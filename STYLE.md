@@ -9,3 +9,7 @@ All extern functions to be CapitalCase
 ## Variables
 
 All variable names to be underscore_case
+
+## Overall Format
+
+Please see the `.clang-format` file
