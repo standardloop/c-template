@@ -61,3 +61,4 @@ todo
 todo-sanitize
 .task
 compile_commands.json
+doxygen/

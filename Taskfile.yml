@@ -193,6 +193,7 @@ tasks:
   docs:doxygen:
     desc: "https://www.doxygen.nl/"
     cmds:
+      - mkdir -p doxygen
       - doxygen Doxyfile
 
   docs:moxygen:
