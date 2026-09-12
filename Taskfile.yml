@@ -1,19 +1,27 @@
 ---
 version: "3"
 
+silent: true
+
 vars:
   CC: clang
-  CC_FLAGS: "-Werror -Wextra -Wall -Wfree-nonheap-object -std=c17"
-  EXECUTABLE_NAME: todo
+  CC_FLAGS: "-Werror -Wextra -Wall -Wfree-nonheap-object -std=c17 -I/usr/local/include"
+  DYN_LIBS_USED_PATH: "-L/usr/local/lib/standardloop"
+  DYN_LIBS_USED: "-lstandardloop-logger"
   TEST_EXECUTABLE_NAME: test
   SOURCE_FILES:
     - todo.c
   TEST_SOURCE_FILES:
     - todo.test.c
+  # for releasing
   DYLIB_NAME: libstandardloop-todo.dylib
+  DYLIB_HEADER: todo.h
   DYLIB_PATH: /usr/local/lib/standardloop/
   DYLIB_INCLUDE_PATH: /usr/local/include/standardloop/
-  RELEASE_VERSION: 0.0.0
+
+includes:
+  #c: https://raw.githubusercontent.com/standardloop/taskfiles/refs/heads/main/c.yml # can pin in future
+  c: ../taskfiles/c.yml # can pin in future
 
 tasks:
   default:
@@ -24,220 +32,22 @@ tasks:
 
   dependencies:
     deps:
-      - dependencies:logger
-      - dependencies:util
-
-  dependencies:helper-task:
-    internal: true
-    cmds:
-      - mkdir -p dependencies/tmp-{{.DYLIB_NAME}}
-      - cd dependencies/tmp-{{.DYLIB_NAME}}
-      - curl -O -J -L https://github.com/standardloop/{{.REPO_NAME}}/releases/download/v{{.DYLIB_VERSION}}/libstandardloop-{{.DYLIB_NAME}}.zip
-      - unzip libstandardloop-{{.DYLIB_NAME}}.zip
-      - sudo mkdir -p /usr/local/lib/standardloop/
-      - sudo mkdir -p /usr/local/include/standardloop/
-      - sudo mv libstandardloop-{{.DYLIB_NAME}}.dylib /usr/local/lib/standardloop/
-      - sudo mv {{.DYLIB_NAME}}.h /usr/local/include/standardloop/ && rm libstandardloop-{{.DYLIB_NAME}}.zip
-
-  # dependencies:logger:
-  #   vars:
-  #     REPO_NAME: c-logger
-  #     DYLIB_VERSION: 0.0.17
-  #     DYLIB_NAME: logger
-  #   cmds:
-  #     - sudo -v
-  #     - task: dependencies:helper-task
-  #   status:
-  #     - otool -L /usr/local/lib/standardloop/libstandardloop-{{.DYLIB_NAME}}.dylib | head -n 2 | tail -n 1 | grep "current version {{.DYLIB_VERSION}}"
-  #     - cat /usr/local/include/standardloop/{{.DYLIB_NAME}}.h | grep "STANDARDLOOP_{{.DYLIB_NAME | upper}}_H_VERSION \"{{.DYLIB_VERSION}}\""
-
-  check-version:
-    internal: true
-    silent: true
-    cmds:
-      - cat todo.h | grep -q {{.RELEASE_VERSION}}
-      - cat todo.h | grep -q "MAJOR_VERSION 0"
-      - cat todo.h | grep -q "MINOR_VERSION 0"
-      - cat todo.h | grep -q "PATCH_VERSION 8"
+      - c:dependencies:logger
 
   release:
-    desc: "Release the dylib."
-    internal: true
     deps:
-      - check-version
-      - release:build
-      - release:move-files
-
-  release:build:
-    desc: "Build the dylib."
-    run: once
-    deps:
-      - check-version
-    cmds:
-      - |
-        {{.CC}} {{.CC_FLAGS}} \
-        {{range .SOURCE_FILES}} {{.}} {{end}} \
-        -O3 \
-        -dynamiclib \
-        -current_version {{.RELEASE_VERSION}} \
-        -compatibility_version {{.RELEASE_VERSION}} \
-        -o {{.DYLIB_NAME}}
-    sources:
-      - "*.c"
-    generates:
-      - "{{.DYLIB_NAME}}"
-
-  release:move-files:
-    internal: true
-    deps:
-      - release:build
-    cmds:
-      - sudo -v
-      - sudo mv {{.DYLIB_NAME}} {{.DYLIB_PATH}}
-      - sudo cp todo.h {{.DYLIB_INCLUDE_PATH}}
-
-  release:clean:
-    ignore_error: true
-    internal: true
-    cmds:
-      - sudo -v
-      - sudo rm -f {{.DYLIB_PATH}}/{{.DYLIB_NAME}}
-      - sudo rm -f {{.DYLIB_INCLUDE_PATH}}/todo.h
-
-  # local test
-  remote:download:
-    desc: "Download the released dylib from the GitHub release."
-    internal: false
-    run: once
-    cmds:
-      - |
-        mkdir -p tmp
-        cd tmp
-        curl -O -J -L https://github.com/standardloop/c-todo/releases/download/v{{.RELEASE_VERSION}}/libstandardloop-todo.zip
-        unzip libstandardloop-todo.zip
-        rm libstandardloop-todo.zip
-
-  remote:move:
-    desc: "Move the dylib and header file into paths for other programs to access."
-    deps:
-      - remote:download
-    cmds:
-      - |
-        cd tmp/
-        sudo -v
-        sudo mv {{.DYLIB_NAME}} {{.DYLIB_PATH}}
-        sudo cp todo.h {{.DYLIB_INCLUDE_PATH}}
-
-  test:
-    desc: "Build and Run the test program."
-    deps:
-      - test:run
+      - c:release
 
   test:build:
-    run: once
-    desc: "Build the test program."
-    cmds:
-      - |
-        {{.CC}} {{.CC_FLAGS}} \
-        test.c \
-        {{range .SOURCE_FILES}} {{.}} {{end}} \
-        {{range .TEST_SOURCE_FILES}} {{.}} {{end}} \
-        -o {{.TEST_EXECUTABLE_NAME}}
-    sources:
-      - "*.c"
-    generates:
-      - "{{.TEST_EXECUTABLE_NAME}}"
-
-  test:build-sanitize:
-    desc: "Build the test with address sanitizer on."
-    run: once
-    cmds:
-      - |
-        {{.CC}} {{.CC_FLAGS}} \
-        test.c \
-        {{range .SOURCE_FILES}} {{.}} {{end}} \
-        {{range .TEST_SOURCE_FILES}} {{.}} {{end}} \
-        -fsanitize=address \
-        -fno-omit-frame-pointer \
-        -o {{.TEST_EXECUTABLE_NAME}}-sanitize
-    sources:
-      - "*.c"
-    generates:
-      - "{{.TEST_EXECUTABLE_NAME}}-sanitize"
-
-  test:run:
-    desc: "Run the test program."
     deps:
-      - test:build
+      - dependencies
     cmds:
-      - ./{{.TEST_EXECUTABLE_NAME}}
-
-  test:leaks:
-    desc: "Run macOS leaks on the test program."
-    deps:
-      - test:build
-    cmds:
-      # - cp /usr/local/lib/standardloop/libstandardloop-todo.dylib ./ # to get around sips we need to move dylibs to local dir
-      - leaks --atExit -- ./{{.TEST_EXECUTABLE_NAME}}
-      # - rm libstandardloop-todo.dylib
+      - task: c:test:build
 
   fmt:
-    silent: true
-    cmds:
-      - find . \( -name "*.c" -o -name "*.h" \) -exec clang-format -style=file -i {} +
+    deps:
+      - c:fmt
 
   docs:
     deps:
-      - docs:moxygen
-
-  docs:doxygen:
-    desc: "https://www.doxygen.nl/"
-    cmds:
-      - mkdir -p doxygen
-      - doxygen Doxyfile
-
-  docs:moxygen:
-    desc: "https://0state.com/moxygen"
-    deps:
-      - docs:doxygen
-    cmds:
-      - moxygen doxygen/xml/ --output docs/index.md --quiet
-      - sed -i '' '/^Defined in /d' docs/index.md
-      - sed -i '' 's/#include <\(.*\)>/#include <standardloop\/\1>/g' docs/index.md
-
-  # docs:
-  #   deps:
-  #     - docs:clang-docs
-
-  # docs:bear:
-  #   run: once
-  #   desc: "Build the test program."
-  #   cmds:
-  #     - |
-  #       bear -- {{.CC}} {{.CC_FLAGS}} \
-  #       test.c \
-  #       -isysroot {{.SDK_PATH}} \
-  #       {{range .SOURCE_FILES}} {{.}} {{end}} \
-  #       {{range .TEST_SOURCE_FILES}} {{.}} {{end}} \
-  #       -o {{.TEST_EXECUTABLE_NAME}}
-  #   vars:
-  #     SDK_PATH:
-  #       sh: xcrun --show-sdk-path
-  #   sources:
-  #     - "*.c"
-  #     - Taskfile.yml
-  #   generates:
-  #     - compile_commands.json
-
-  # docs:clang-docs:
-  #   deps:
-  #     - docs:bear
-  #   vars:
-  #     OUT_DIR: docs
-  #   cmds:
-  #     - mkdir -p {{.OUT_DIR}}/md {{.OUT_DIR}}/json
-  #     - clang-doc --format=md --output={{.OUT_DIR}} -p=. {{range .SOURCE_FILES}} {{.}} {{end}}
-  #     - rm -rf {{.OUT_DIR}}/json
-  #   sources:
-  #     - compile_commands.json
-  #     - "*.c"
+      - c:docs
