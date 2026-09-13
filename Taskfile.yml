@@ -4,9 +4,6 @@ version: "3"
 silent: true
 
 vars:
-  CC: clang
-  CC_FLAGS: "-Werror -Wextra -Wall -Wfree-nonheap-object -std=c17 -I/usr/local/include"
-  DYN_LIBS_USED_PATH: "-L/usr/local/lib/standardloop"
   DYN_LIBS_USED: "-lstandardloop-logger"
   TEST_EXECUTABLE_NAME: test
   SOURCE_FILES:
@@ -16,8 +13,6 @@ vars:
   # for releasing
   DYLIB_NAME: libstandardloop-todo.dylib
   DYLIB_HEADER: todo.h
-  DYLIB_PATH: /usr/local/lib/standardloop/
-  DYLIB_INCLUDE_PATH: /usr/local/include/standardloop/
 
 includes:
   # c: https://raw.githubusercontent.com/standardloop/taskfiles/refs/heads/main/c.yml # can pin in future
