@@ -13,6 +13,7 @@ jobs:
       DYLIB_NAME: "libstandardloop-todo.dylib"
       HEADER_NAME: "todo.h"
       ZIP_NAME: "libstandardloop-todo.zip"
+      CI: true
 
     steps:
       - name: Checkout repository

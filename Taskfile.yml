@@ -3,6 +3,9 @@ version: "3"
 
 silent: true
 
+includes:
+  c: "{{if .CI }}https://raw.githubusercontent.com/standardloop/taskfiles/refs/heads/main/c.yml{{else}}../taskfiles/c.yml{{end}}" # can pin in future
+
 vars:
   DYN_LIBS_USED: "-lstandardloop-logger"
   TEST_EXECUTABLE_NAME: test
@@ -13,10 +16,6 @@ vars:
   # for releasing
   DYLIB_NAME: libstandardloop-todo.dylib
   DYLIB_HEADER: todo.h
-
-includes:
-  # c: https://raw.githubusercontent.com/standardloop/taskfiles/refs/heads/main/c.yml # can pin in future
-  c: ../taskfiles/c.yml
 
 tasks:
   default:
@@ -38,6 +37,10 @@ tasks:
       - dependencies
     cmds:
       - task: c:test:build
+
+  clean:
+    deps:
+      - c:test:clean
 
   fmt:
     deps:
