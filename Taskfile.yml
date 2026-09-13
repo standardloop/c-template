@@ -20,8 +20,8 @@ vars:
   DYLIB_INCLUDE_PATH: /usr/local/include/standardloop/
 
 includes:
-  #c: https://raw.githubusercontent.com/standardloop/taskfiles/refs/heads/main/c.yml # can pin in future
-  c: ../taskfiles/c.yml # can pin in future
+  # c: https://raw.githubusercontent.com/standardloop/taskfiles/refs/heads/main/c.yml # can pin in future
+  c: ../taskfiles/c.yml
 
 tasks:
   default:
