@@ -19,9 +19,8 @@ vars:
 
 tasks:
   default:
-    silent: true
     cmds:
-      - task test
+      - task: test
 
   dependencies:
     cmds:
