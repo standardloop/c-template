@@ -61,6 +61,10 @@ $ brew install \
 $ npm install moxygen -g
 ```
 
+## Releasing
+
+Releases are handled via GitHub Actions.
+
 ## Docs
 
 Docs are generated a first generated with `doxygen` as `xml` and then `moxygen` reads the xml to output markdown in the `docs/` folder.
