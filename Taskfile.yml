@@ -4,7 +4,8 @@ version: "3"
 silent: true
 
 includes:
-  c: https://raw.githubusercontent.com/standardloop/taskfiles/refs/heads/main/c.yml # ../taskfiles/c.yml # can pin in future
+  c: https://raw.githubusercontent.com/standardloop/taskfiles/refs/heads/main/c.yml # can pin in future
+  # c: ../taskfiles/c.yml
 
 vars:
   DYN_LIBS_USED: "-lstandardloop-logger -lstandardloop-collections -lstandardloop-util"
@@ -18,27 +19,37 @@ vars:
   DYLIB_HEADER: todo.h
 
 tasks:
+  list:
+    desc: "Lists all the tasks available to run."
+    cmds:
+      - yq '.tasks | to_entries | .[] | "* " + .key + ":\t" + (.value.desc // "")' Taskfile.yml | column -t -s $'\t'
+
   default:
+    desc: "Builds and runs the test program."
     cmds:
       - task: test
 
   dependencies:
+    desc: "Downloads C program dependencies."
     cmds:
       - task: c:dependencies:logger
       - task: c:dependencies:util
       - task: c:dependencies:collections
 
   release:
+    desc: "Release the dylib, used by GitHub actions."
     deps:
       - c:release
 
   test:build:
+    desc: "Builds the test program."
     deps:
       - dependencies
     cmds:
       - task: c:test:build
 
   test:run:
+    desc: "Runs the test program."
     aliases:
       - test
     deps:
@@ -47,12 +58,14 @@ tasks:
       - ./{{.TEST_EXECUTABLE_NAME}}
 
   test:build-sanitize:
+    desc: "Builds the test program with address sanitizers."
     deps:
       - dependencies
     cmds:
       - task: c:test:build-sanitize
 
   test:run-sanitize:
+    desc: "Runs the test program with address sanitizers."
     aliases:
       - sanitize
     deps:
@@ -61,14 +74,17 @@ tasks:
       - ./{{.TEST_EXECUTABLE_NAME}}-sanitize
 
   clean:
+    desc: "Cleans binary files."
     deps:
       - c:test:clean
 
   fmt:
+    desc: "Formats the C code with the `.clang-format` file."
     deps:
       - c:fmt
 
   docs:
+    desc: "Generate docs/index.md and the task list in README.md"
     deps:
       - c:docs
 

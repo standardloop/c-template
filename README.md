@@ -12,30 +12,29 @@ Template repo to spawn C projects from.
 
 This repo uses [task](https://github.com/go-task/task).
 
-Please run the default `task` to see all the avaiable `tasks`
+Please run `task list` to see all the avaiable `tasks`.
+
+## Available Tasks
+
+<!-- TASKS_START -->
 
 ```sh
-$ task --list-all
 task: Available tasks for this project:
-* default:                   Show all avaiable tasks.
-* test:                      Build and Run the test program.
-* release:build:             Build the dylib.
-* remote:download:           Download the released dylib from the GitHub release.
-* remote:move:               Move the dylib and header file into paths for other programs to access.
-* test:build:                Build the test program.
-* test:build-sanitize:       Build the test with address sanitizer on.
-* test:leaks:                Run macOS leaks on the test program.
-* test:run:                  Run the test program.
+* list                  Lists all the tasks available to run.
+* default               Builds and runs the test program.
+* dependencies          Downloads C program dependencies.
+* release               Release the dylib, used by GitHub actions.
+* test:build            Builds the test program.
+* test:run              Runs the test program.
+* test:build-sanitize   Builds the test program with address sanitizers.
+* test:run-sanitize     Runs the test program with address sanitizers.
+* clean                 Cleans binary files.
+* fmt                   Formats the C code with the `.clang-format` file.
+* docs                  Generate docs/index.md and the task list in README.md
+* test:leaks            Run macOS leaks on the test program.
 ```
 
-## Building
-
-```sh
-$ task test:build
-$ ./test
-$ task test:build-sanitize
-$ ./test-sanitize
-```
+<!-- TASKS_END -->
 
 ### Dependencies
 
