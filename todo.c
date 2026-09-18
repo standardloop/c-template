@@ -3,7 +3,7 @@
 #include "./todo.h"
 #include <standardloop/logger.h>
 
-void Todo(void)
+extern void Todo(void)
 {
     Log(TRACE, "hello");
 }

@@ -1,6 +1,10 @@
 #ifndef STANDARDLOOP_TODO_H
 #define STANDARDLOOP_TODO_H
 
-void Todo(void);
+extern void Todo(void);
+
+/// @cond INTERNAL
+extern void TestTodo(void);
+/// @endcond
 
 #endif

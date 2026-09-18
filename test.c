@@ -8,7 +8,7 @@
 int main(void)
 {
     InitLogger(TRACE, STANDARD_FMT, false, true, true, true);
-    Todo();
+    TestTodo();
     assert(1);
     return EXIT_SUCCESS;
 }
