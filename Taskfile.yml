@@ -28,14 +28,6 @@ tasks:
       - task: c:dependencies:util
       - task: c:dependencies:collections
 
-  test:
-    deps:
-      - test:run
-
-  sanitize:
-    deps:
-      - test:run-sanitize
-
   release:
     deps:
       - c:release
@@ -47,6 +39,8 @@ tasks:
       - task: c:test:build
 
   test:run:
+    aliases:
+      - test
     deps:
       - test:build
     cmds:
@@ -59,6 +53,8 @@ tasks:
       - task: c:test:build-sanitize
 
   test:run-sanitize:
+    aliases:
+      - sanitize
     deps:
       - test:build-sanitize
     cmds:
