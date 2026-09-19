@@ -39,12 +39,15 @@ tasks:
   release:
     desc: "Release the dylib, used by GitHub actions."
     deps:
-      - c:release
+      - dependencies
+    cmds:
+      - task: c:release
 
   test:build:
     desc: "Builds the test program."
     deps:
       - dependencies
+      - c:dependencies:testing
     cmds:
       - task: c:test:build
 
@@ -61,6 +64,7 @@ tasks:
     desc: "Builds the test program with address sanitizers."
     deps:
       - dependencies
+      - c:dependencies:testing
     cmds:
       - task: c:test:build-sanitize
 
